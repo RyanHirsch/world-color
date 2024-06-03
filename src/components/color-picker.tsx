@@ -1,12 +1,13 @@
 import { useAtom } from "jotai";
 import { activeColorAtom } from "../atoms/color";
 import { useEffect } from "react";
+import { DEFAULT_COUNTRY_FILL } from "../atoms/countries";
 
 const colors = [
   { name: "Red", hex: "#FF0000" },
   { name: "Green", hex: "#00FF00" },
   { name: "Blue", hex: "#0000FF" },
-  { name: "Purple", hex: "#9980FA" },
+  { name: "Purple", hex: DEFAULT_COUNTRY_FILL },
 ];
 
 export function ColorPicker() {

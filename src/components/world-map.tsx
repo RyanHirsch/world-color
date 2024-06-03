@@ -1,24 +1,14 @@
 import { useChartDimensions } from "../hooks/use-chart-dimensions";
 import * as d3 from "d3";
 import * as d3GeoProjection from "d3-geo";
-import { useAtomValue } from "jotai";
-import countryShapes from "../data/countries.json";
-import { readColorAtom } from "../atoms/color";
-import { useState } from "react";
+import { useAtom } from "jotai";
+import { countriesAtom } from "../atoms/countries";
+import { splitAtom } from "jotai/utils";
+import { Country } from "./country";
 
-const indexedCountries = countryShapes.features.reduce((agg, shape) => {
-  const key = shape.properties.subunit;
-  agg[key] = shape;
-  agg[key].fill = "#9980FA";
-  return agg;
-}, {});
-
+const countriesAtomsAtom = splitAtom(countriesAtom);
 export function WorldMap({ projectionName = "geoNaturalEarth1" }) {
-  const activeColor = useAtomValue(readColorAtom);
-  const [countries, setCountries] = useState(indexedCountries);
-  const [countriesArray, setCountriesArray] = useState(
-    Object.values(indexedCountries),
-  );
+  const [countries] = useAtom(countriesAtomsAtom);
   // grab our custom React hook we defined above
   const [ref, dms] = useChartDimensions({});
   // this is the definition for the whole Earth
@@ -53,30 +43,8 @@ export function WorldMap({ projectionName = "geoNaturalEarth1" }) {
             fill="none"
             stroke="#fff"
           />
-          {countriesArray.map((shape) => {
-            return (
-              <path
-                key={shape.properties.subunit}
-                d={pathGenerator(shape)}
-                fill={shape.fill}
-                stroke="#fff"
-                onClick={() => {
-                  setCountriesArray((allCountries) =>
-                    allCountries.map((c) => {
-                      if (c.properties.subunit === shape.properties.subunit) {
-                        return {
-                          ...c,
-                          fill: activeColor.hex,
-                        };
-                      }
-                      return c;
-                    }),
-                  );
-                }}
-              >
-                <title>{shape.properties.name}</title>
-              </path>
-            );
+          {countries.map((c) => {
+            return <Country pathGenerator={pathGenerator} countryAtom={c} />;
           })}
         </g>
       </svg>
